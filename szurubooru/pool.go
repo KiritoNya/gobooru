@@ -9,18 +9,18 @@ import (
 
 // Pool is a struct with the pool's properties
 type Pool struct {
-	Version int `json:"version,omitempty"`
-	Id int `json:"id,omitempty"`
-	Names []string `json:"names"`
-	Category string `json:"category"`
-	Posts []*Post `json:"posts,omitempty"`
+	Version      int       `json:"version,omitempty"`
+	Id           int       `json:"id,omitempty"`
+	Names        []string  `json:"names"`
+	Category     string    `json:"category"`
+	Posts        []int     `json:"posts,omitempty"`
 	CreationTime time.Time `json:"creationTime"`
 	LastEditTime time.Time `json:"lastEditTime"`
-	PostCount int `json:"postCount"`
-	Description string `json:"description"`
+	PostCount    int       `json:"postCount"`
+	Description  string    `json:"description"`
 }
 
-func (p *Pool) Create() (*Pool, error){
+func (p *Pool) Create() (*Pool, error) {
 	// Check name
 	if p.Names == nil {
 		return nil, errors.New("Pool's name not setted")
