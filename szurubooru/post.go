@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,8 +13,8 @@ import (
 type Post struct {
 	Version            int           `json:"version,omitempty"`
 	Id                 int           `json:"id,omitempty"`
-	CreationTime       time.Time    `json:"creationTime,omitempty"`
-	LastEditTime       time.Time    `json:"lastEditTime,omitempty"`
+	CreationTime       time.Time     `json:"creationTime,omitempty"`
+	LastEditTime       time.Time     `json:"lastEditTime,omitempty"`
 	Safety             string        `json:"safety"`
 	Source             string        `json:"source,omitempty"`
 	Type               string        `json:"type,omitempty"`
@@ -25,34 +26,34 @@ type Post struct {
 	ThumbnailUrl       string        `json:"thumbnailUrl,omitempty"`
 	Flags              []string      `json:"flags,omitempty"`
 	Tags               []*MicroTag   `json:"tags"`
-	Relations          []*Post   `json:"relations,omitempty"`
+	Relations          []*Post       `json:"relations,omitempty"`
 	Notes              interface{}   `json:"notes,omitempty"`
 	User               interface{}   `json:"user,omitempty"`
-	Score              int   `json:"score,omitempty"`
-	OwnScore           int   `json:"ownScore,omitempty"`
-	OwnFavorite        bool  `json:"ownFavorite,omitempty"`
-	TagCount           int   `json:"tagCount,omitempty"`
-	FavoriteCount      int   `json:"favoriteCount,omitempty"`
-	CommentCount       int   `json:"commentCount,omitempty"`
-	NoteCount          int   `json:"noteCount,omitempty"`
-	FeatureCount       int   `json:"featureCount,omitempty"`
-	RelationCount      int   `json:"relationCount,omitempty"`
-	LastFeatureTime    time.Time   `json:"lastFeatureTime,omitempty"`
+	Score              int           `json:"score,omitempty"`
+	OwnScore           int           `json:"ownScore,omitempty"`
+	OwnFavorite        bool          `json:"ownFavorite,omitempty"`
+	TagCount           int           `json:"tagCount,omitempty"`
+	FavoriteCount      int           `json:"favoriteCount,omitempty"`
+	CommentCount       int           `json:"commentCount,omitempty"`
+	NoteCount          int           `json:"noteCount,omitempty"`
+	FeatureCount       int           `json:"featureCount,omitempty"`
+	RelationCount      int           `json:"relationCount,omitempty"`
+	LastFeatureTime    time.Time     `json:"lastFeatureTime,omitempty"`
 	FavoritedBy        interface{}   `json:"favoritedBy,omitempty"`
-	HasCustomThumbnail bool   `json:"hasCustomThumbnail,omitempty"`
-	MimeType           string   `json:"mimeType,omitempty"`
+	HasCustomThumbnail bool          `json:"hasCustomThumbnail,omitempty"`
+	MimeType           string        `json:"mimeType,omitempty"`
 	Comments           []interface{} `json:"comments,omitempty"`
 	Pools              []interface{} `json:"pools,omitempty"`
 }
 
 type PostOperation struct {
 	Post
-	Tags []string `json:"tags,omitempty"`
-	Relations []int `json:"relations,omitempty"`
+	Tags      []string `json:"tags,omitempty"`
+	Relations []int    `json:"relations,omitempty"`
 }
 
 type MicroPost struct {
-	Name string `json:"name"`
+	Name         string `json:"name"`
 	ThumbnailUrl string `json:"thumbnailUrl"`
 }
 
@@ -82,12 +83,12 @@ func (p *Post) Create(fileData []byte, fileName string) (*Post, error) {
 
 	// Create Json
 	var raw = struct {
-		Safety string `json:"safety"`
-		Tags []string `json:"tags"`
-		ContentToken string `json:"contentToken"`
+		Safety       string   `json:"safety"`
+		Tags         []string `json:"tags"`
+		ContentToken string   `json:"contentToken"`
 	}{
-		Safety: p.Safety,
-		Tags: listTags,
+		Safety:       p.Safety,
+		Tags:         listTags,
 		ContentToken: token,
 	}
 
@@ -103,7 +104,7 @@ func (p *Post) Create(fileData []byte, fileName string) (*Post, error) {
 	}
 
 	// Check status code
-	if code != http.StatusOK  {
+	if code != http.StatusOK {
 		return nil, parseError(content)
 	}
 
@@ -128,13 +129,14 @@ func (p *Post) Update() (*Post, error) {
 		return nil, err
 	}
 
-	data, code, err := Client.Do("PUT", "/post/" + strconv.Itoa(p.Id), bytes.NewReader(data))
+	data, code, err := Client.Do("PUT", "/post/"+strconv.Itoa(p.Id), bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
 
 	// Check status code
-	if code != http.StatusOK  {
+	if code != http.StatusOK {
+		fmt.Println(code)
 		return nil, parseError(data)
 	}
 
@@ -171,13 +173,13 @@ func (p *Post) Delete() error {
 	}
 
 	// Do request
-	data, code, err := Client.Do("PUT", "/post/" +  strconv.Itoa(p.Id), bytes.NewReader(data))
+	data, code, err := Client.Do("PUT", "/post/"+strconv.Itoa(p.Id), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
 
 	// Check status code
-	if code != http.StatusOK  {
+	if code != http.StatusOK {
 		return parseError(data)
 	}
 
@@ -197,7 +199,7 @@ func (p *Post) toPostOperation() *PostOperation {
 	}
 
 	return &PostOperation{
-		Post:      Post{
+		Post: Post{
 			Version:            p.Version,
 			Id:                 p.Id,
 			CreationTime:       p.CreationTime,
